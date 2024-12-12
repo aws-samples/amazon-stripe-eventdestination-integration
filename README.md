@@ -1,4 +1,4 @@
-# StripeEventBridgeIntegration
+# Stripe EventDestination Integration
 
 
 Stripe is a financial infrastructure platform that provides businesses with the tools to power their online and in person payments, embedded financial services, and custom revenue models. In this fast-paced digital world, customer payment flows require automated workflows to kick off processes such as fulfilling orders after a successful payment, granting user access after a subscription upgrade, or sending notifications for refund processing. 

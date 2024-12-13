@@ -19,7 +19,7 @@ In this blog post, we'll guide you through this integration workflow automation.
 An AWS account \
 A Stripe account with API access (To set up a new Stripe account, visit https://dashboard.stripe.com/) \
 AWS CLI configured with appropriate permissions \
-AWS Account user with IAM Policy mentioned in CloudFormation/IAMPolicy.json \
+AWS Account user with IAM Policy mentioned in CloudFormation/IAMPolicy.json 
 
 # Create infrastructure using CloudFormation
 
@@ -129,9 +129,9 @@ To remove Stripe EventDestination, login into Stripe Dashboard and click on work
 # Troubleshooting
 If the stack creation fails, check the CloudFormation events in the AWS Console for error messages.
 Ensure that your Stripe API key is correct and has the necessary permissions.
-Verify that the AWS CLI has the required permissions to create all resources.
+
 # Security Note
-The Stripe API key is stored as a secure string in CloudFormation. However, ensure you follow AWS best practices for managing sensitive information.
+The Stripe API key is stored as a secure string in CloudFormation. However, ensure you follow Stripe best practices(https://docs.stripe.com/keys-best-practices) for managing sensitive information.
 
 # Contributing
 Feel free to submit issues or pull requests if you find any problems or have suggestions for improvements.

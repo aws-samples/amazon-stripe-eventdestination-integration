@@ -1,0 +1,671 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+
+Parameters:
+  StripeApiKey:
+    Type: String
+    NoEcho: true
+    Description: '[Required]The Stripe account’s API key to use. Use your Stripe account’s Standard key’s secret key value. Restricted access keys are not supported for created Event Destinations. More Information about Stripe Key is at https://docs.stripe.com/keys'
+    AllowedPattern: '^sk_(test|live)_[A-Za-z0-9]{24,99}$'
+  EventDestinationName:
+    Type: String
+    Description: '[Required]The name of the Stripe Event Destination.'
+    AllowedPattern: '^[a-zA-Z0-9\\s\\.,!?-]{1,255}$'
+  EnabledEvents:
+    Type: List<String>
+    Default: customer.created
+    Description: '[Required]The list of events to enable for your Stripe Event Destination. You must select a combination of only snapshot events or only thing events; Selecting a mix of thin and snapshot event types are not supported and will result in an error. Ensure that your EventPayload parameter is set correctly to either thin or snapshot depending on your selection. More information at https://docs.stripe.com/event-destinations#events-overview'
+    AllowedValues:
+      - account.external_account.created
+      - account.external_account.deleted
+      - account.external_account.updated
+      - account.updated
+      - balance.available
+      - billing.alert.triggered
+      - billing_portal.configuration.created
+      - billing_portal.configuration.updated
+      - billing_portal.session.created
+      - capability.updated
+      - cash_balance.funds_available
+      - charge.captured
+      - charge.dispute.closed
+      - charge.dispute.created
+      - charge.dispute.funds_reinstated
+      - charge.dispute.funds_withdrawn
+      - charge.dispute.updated
+      - charge.expired
+      - charge.failed
+      - charge.pending
+      - charge.refund.updated
+      - charge.refunded
+      - charge.succeeded
+      - charge.updated
+      - checkout.session.async_payment_failed
+      - checkout.session.async_payment_succeeded
+      - checkout.session.completed
+      - checkout.session.expired
+      - climate.order.canceled
+      - climate.order.created
+      - climate.order.delayed
+      - climate.order.delivered
+      - climate.order.product_substituted
+      - climate.product.created
+      - climate.product.pricing_updated
+      - coupon.created
+      - coupon.deleted
+      - coupon.updated
+      - credit_note.created
+      - credit_note.updated
+      - credit_note.voided
+      - customer.created
+      - customer.deleted
+      - customer.discount.created
+      - customer.discount.deleted
+      - customer.discount.updated
+      - customer.source.created
+      - customer.source.deleted
+      - customer.source.expiring
+      - customer.source.updated
+      - customer.subscription.created
+      - customer.subscription.deleted
+      - customer.subscription.paused
+      - customer.subscription.pending_update_applied
+      - customer.subscription.pending_update_expired
+      - customer.subscription.resumed
+      - customer.subscription.trial_will_end
+      - customer.subscription.updated
+      - customer.tax_id.created
+      - customer.tax_id.deleted
+      - customer.tax_id.updated
+      - customer.updated
+      - customer_cash_balance_transaction.created
+      - entitlements.active_entitlement_summary.updated
+      - file.created
+      - financial_connections.account.created
+      - financial_connections.account.deactivated
+      - financial_connections.account.disconnected
+      - financial_connections.account.reactivated
+      - financial_connections.account.refreshed_balance
+      - financial_connections.account.refreshed_ownership
+      - financial_connections.account.refreshed_transactions
+      - identity.verification_session.canceled
+      - identity.verification_session.created
+      - identity.verification_session.processing
+      - identity.verification_session.requires_input
+      - identity.verification_session.verified
+      - invoice.created
+      - invoice.deleted
+      - invoice.finalization_failed
+      - invoice.finalized
+      - invoice.marked_uncollectible
+      - invoice.overdue
+      - invoice.paid
+      - invoice.payment_action_required
+      - invoice.payment_failed
+      - invoice.payment_succeeded
+      - invoice.sent
+      - invoice.upcoming
+      - invoice.updated
+      - invoice.voided
+      - invoice.will_be_due
+      - invoiceitem.created
+      - invoiceitem.deleted
+      - issuing_authorization.created
+      - issuing_authorization.updated
+      - issuing_card.created
+      - issuing_card.updated
+      - issuing_cardholder.created
+      - issuing_cardholder.updated
+      - issuing_dispute.closed
+      - issuing_dispute.created
+      - issuing_dispute.funds_reinstated
+      - issuing_dispute.funds_rescinded
+      - issuing_dispute.submitted
+      - issuing_dispute.updated
+      - issuing_personalization_design.activated
+      - issuing_personalization_design.deactivated
+      - issuing_personalization_design.rejected
+      - issuing_personalization_design.updated
+      - issuing_token.created
+      - issuing_token.updated
+      - issuing_transaction.created
+      - issuing_transaction.purchase_details_receipt_updated
+      - issuing_transaction.updated
+      - mandate.updated
+      - payment_intent.amount_capturable_updated
+      - payment_intent.canceled
+      - payment_intent.created
+      - payment_intent.partially_funded
+      - payment_intent.payment_failed
+      - payment_intent.processing
+      - payment_intent.requires_action
+      - payment_intent.succeeded
+      - payment_link.created
+      - payment_link.updated
+      - payment_method.attached
+      - payment_method.automatically_updated
+      - payment_method.detached
+      - payment_method.updated
+      - payout.canceled
+      - payout.created
+      - payout.failed
+      - payout.paid
+      - payout.reconciliation_completed
+      - payout.updated
+      - person.created
+      - person.deleted
+      - person.updated
+      - plan.created
+      - plan.deleted
+      - plan.updated
+      - price.created
+      - price.deleted
+      - price.updated
+      - product.created
+      - product.deleted
+      - product.updated
+      - promotion_code.created
+      - promotion_code.updated
+      - quote.accepted
+      - quote.canceled
+      - quote.created
+      - quote.finalized
+      - quote.will_expire
+      - radar.early_fraud_warning.created
+      - radar.early_fraud_warning.updated
+      - refund.created
+      - refund.failed
+      - refund.updated
+      - reporting.report_run.failed
+      - reporting.report_run.succeeded
+      - review.closed
+      - review.opened
+      - setup_intent.canceled
+      - setup_intent.created
+      - setup_intent.requires_action
+      - setup_intent.setup_failed
+      - setup_intent.succeeded
+      - sigma.scheduled_query_run.created
+      - source.canceled
+      - source.chargeable
+      - source.failed
+      - source.mandate_notification
+      - source.refund_attributes_required
+      - source.transaction.created
+      - source.transaction.updated
+      - subscription_schedule.aborted
+      - subscription_schedule.canceled
+      - subscription_schedule.completed
+      - subscription_schedule.created
+      - subscription_schedule.expiring
+      - subscription_schedule.released
+      - subscription_schedule.updated
+      - tax.settings.updated
+      - tax_rate.created
+      - tax_rate.updated
+      - terminal.reader.action_failed
+      - terminal.reader.action_succeeded
+      - test_helpers.test_clock.advancing
+      - test_helpers.test_clock.created
+      - test_helpers.test_clock.deleted
+      - test_helpers.test_clock.internal_failure
+      - test_helpers.test_clock.ready
+      - topup.canceled
+      - topup.created
+      - v1.billing.meter.error_report_triggered
+      - v1.billing.meter.no_meter_found
+
+  StripeAPIVersion:
+    Type: String
+    Default: 2024-10-28.acacia
+    Description: '[Required]The Stripe API version for calling Create Event Destination. You need to set a version >= “2024-10-28.acacia”. More information about API Verions at https://docs.stripe.com/sdks/set-version'
+    AllowedPattern: '^20[0-9]{2}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])\.[a-z]+$'
+  Description:
+    Type: String
+    Description: '[Optional]An optional description of what the Event Destination is used for.'
+    Default: This is my event destination, I like it a lot
+  EventFrom:
+    Type: String
+    Description: '[Required]Where the Stripe Event Destination to route events from. Set this parameter to either self or other_accounts. More information at https://docs.stripe.com/api/v2/event-destinations/create#v2_create_event_destinations-events_from'
+    Default: self
+    AllowedValues: 
+      - self
+      - other_accounts
+    AllowedPattern: '^(self|other_accounts)$'
+  Metadata:
+    Type: CommaDelimitedList
+    Description: '[Optional]Metadata to set on the Stripe Event Destination. Metadata is an attribute on certain Stripe objects that lets you store more information, structured as key-value pairs, to these objects for your own use and reference. Please enter in CommaDelimitedList format (example- env,test). More information about Metdata at  https://docs.stripe.com/metadata'
+    Default: ''
+  EventPayload:
+    Type: String
+    Description: '[Required]The payload type of events being subscribed to in the Stripe Event Destination. Set this parameter to thin or snapshot. More information at https://docs.stripe.com/event-destinations#events-overview '
+    Default: snapshot
+    AllowedValues: 
+      - snapshot
+      - thin
+    AllowedPattern: '^(snapshot|thin)$'
+  SnapshotAPIVersion:
+    Type: String
+    Description: '[Optional]The API version to render events when using the snapshot event payload. Leaving this parameter blank defaults rending your event payload to your Stripe default version.'
+    Default: ''
+Rules:
+  thinEventValidation:
+    RuleCondition: !Equals 
+      - !Ref EventPayload
+      - thin
+    Assertions:
+      - Assert:
+          Fn::Or:
+            - Fn::Contains:
+                - !Ref EnabledEvents
+                - v1.billing.meter.error_report_triggered
+            - Fn::Contains:
+                - !Ref EnabledEvents
+                - v1.billing.meter.no_meter_found
+        AssertDescription: 'For thin event payload, you must select thin events'
+
+  snapshotEventValidation:
+    RuleCondition: !Equals 
+      - !Ref EventPayload
+      - snapshot
+    Assertions:
+      - Assert:
+          Fn::Not:
+            - Fn::Or:
+              - Fn::Contains:
+                  - !Ref EnabledEvents
+                  - v1.billing.meter.error_report_triggered
+              - Fn::Contains:
+                  - !Ref EnabledEvents
+                  - v1.billing.meter.no_meter_found
+        AssertDescription: 'For snapshot event payload, you cannot select thin event types'
+
+
+
+
+Resources:
+
+  StripeEventDestinationFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Handler: index.lambda_handler
+      Runtime: python3.12
+      Timeout: 600
+      Code:
+        ZipFile: |
+          import json
+          import subprocess
+          from typing import Dict, Any, List, Optional
+          import logging
+
+          # Set up logging
+          logger = logging.getLogger()
+          logger.setLevel(logging.INFO)
+
+          def process_metadata(metadata: Optional[List[str]]) -> Dict[str, str]:
+              """
+              Process metadata array into a dictionary if provided.
+              Returns empty dict if metadata is None.
+              Raises ValueError if metadata format is invalid.
+              """
+              if not metadata:
+                  return {}
+              
+              if len(metadata) % 2 != 0:
+                  raise ValueError("Metadata must contain key-value pairs")
+              
+              metadata_dict = {}
+              try:
+                  for i in range(0, len(metadata), 2):
+                      metadata_dict[metadata[i]] = metadata[i + 1]
+                  return metadata_dict
+              except IndexError:
+                  raise ValueError("Invalid metadata format")
+
+          def create_error_response(status_code: int, message: str) -> Dict[str, Any]:
+              return {
+                  "statusCode": status_code,
+                  "body": message
+              }
+
+          def get_aws_context(context: Any) -> tuple[str, str]:
+              """Extract AWS account ID and region from context"""
+              try:
+                  account_id = context.invoked_function_arn.split(":")[4]
+                  region = context.invoked_function_arn.split(":")[3]
+                  return account_id, region
+              except (IndexError, AttributeError) as e:
+                  logger.error("Error extracting AWS context information: %s", str(e))
+                  raise ValueError("Failed to extract AWS account information")
+
+          def build_request_payload(event: Dict[str, Any], account_id: str, region: str) -> Dict[str, Any]:
+              
+               # Convert EventFrom to array if it's a string
+              events_from = [event["EventFrom"]] if isinstance(event["EventFrom"], str) else event["EventFrom"]
+
+              """Construct the request payload for Stripe API"""
+              payload = {
+                  "name": event["EventDestinationName"],
+                  "description": event["Description"],
+                  "enabled_events": event["EnabledEvents"],
+                  "type": "amazon_eventbridge",
+                  "amazon_eventbridge": {
+                      "aws_account_id": account_id,
+                      "aws_region": region
+                  },
+                  "event_payload": event["EventPayload"],
+                  "events_from": events_from
+              }
+
+              # Handle metadata if present and valid
+              metadata = event.get("Metadata")
+              if metadata and not (isinstance(metadata, list) and metadata == ['']):
+                  metadata_dict = process_metadata(metadata)
+                  payload["metadata"] = metadata_dict
+
+              # Add snapshot API version if present
+              if snapshot_api_version := event.get("SnapshotAPIVersion"):
+                  payload["snapshot_api_version"] = snapshot_api_version
+
+              return payload
+
+          def validate_input(event: Dict[str, Any]) -> None:
+              """Validate required input parameters"""
+              required_params = [
+                  "StripeApiKey",
+                  "EventDestinationName",
+                  "EnabledEvents",
+                  "StripeAPIVersion",
+                  "Description",
+                  "EventFrom",
+                  "EventPayload"
+              ]
+              
+              missing_params = [param for param in required_params if param not in event]
+              if missing_params:
+                  raise ValueError(f"Missing required parameters: {', '.join(missing_params)}")
+
+          def call_stripe_api(payload: Dict[str, Any], stripe_api_key: str, stripe_api_version: str) -> Dict[str, Any]:
+                """Make API call to Stripe and handle errors"""
+                curl_command = [
+                    "curl",
+                    "-X", "POST",
+                    "https://api.stripe.com/v2/core/event_destinations",
+                    "-H", f"Authorization: Bearer {stripe_api_key}",
+                    "-H", f"Stripe-Version: {stripe_api_version}",
+                    "-H", "Content-Type: application/json",
+                    "--data", json.dumps(payload)
+                ]
+
+                logger.info("Executing Stripe API request")
+                result = subprocess.run(curl_command, capture_output=True, text=True)
+                
+                try:
+                    response_data = json.loads(result.stdout if result.stdout else result.stderr)
+                    
+                    # Check if there's an error in the response
+                    if 'error' in response_data:
+                        error_message = response_data['error'].get('message', 'Unknown error')
+                        error_type = response_data['error'].get('type', 'unknown_error')
+                        
+                        logger.error(f"Stripe API error: {error_type} - {error_message}")
+                        return {
+                            "statusCode": 400 if error_type == 'invalid_request_error' else 500,
+                            "body": json.dumps({
+                                "error": {
+                                    "message": error_message,
+                                    "type": error_type
+                                }
+                            })
+                        }
+                    
+                    logger.info("Stripe API response: %s", json.dumps(response_data))
+                    return {"statusCode": 200, "body": json.dumps(response_data)}
+                    
+                except json.JSONDecodeError as e:
+                    logger.error("Failed to parse Stripe API response: %s", str(e))
+                    return {
+                        "statusCode": 500,
+                        "body": json.dumps({
+                            "error": {
+                                "message": "Failed to parse API response",
+                                "type": "parse_error"
+                            }
+                        })
+                    }
+
+
+          def lambda_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
+              try:
+                  # Validate input parameters
+                  validate_input(event)
+                  
+                  # Get AWS context information
+                  account_id, region = get_aws_context(context)
+                  
+                  # Build request payload
+                  request_payload = build_request_payload(event, account_id, region)
+                  logger.info("Request payload: %s", json.dumps(request_payload))
+                  
+                  # Call Stripe API and return its response (including any errors)
+                  return call_stripe_api(
+                      request_payload,
+                      event["StripeApiKey"],
+                      event["StripeAPIVersion"]
+                  )
+
+              except ValueError as e:
+                  logger.error("Validation error: %s", str(e))
+                  return create_error_response(400, str(e))
+              except Exception as e:
+                  logger.error("Unexpected error: %s", str(e))
+                  return create_error_response(500, "Internal server error")
+      Role: !GetAtt LambdaExecutionRole.Arn
+
+
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+
+  LambdaPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref StripeEventDestinationFunction
+      Action: 'lambda:InvokeFunction'
+      Principal: 'cloudformation.amazonaws.com'
+
+  InvokeStripeEventDestination:
+    Type: AWS::Serverless::Function
+    DependsOn: StripeEventDestinationFunction
+    Properties:
+      Handler: index.lambda_handler
+      Runtime: python3.12
+      InlineCode: |
+        import boto3
+        import json
+        import cfnresponse
+        import logging
+
+        logger = logging.getLogger()
+        logger.setLevel(logging.INFO)
+
+        def lambda_handler(event, context):
+            # For Delete requests, immediately send a SUCCESS response.
+            if event.get('RequestType') == "Delete":
+                cfnresponse.send(event, context, cfnresponse.SUCCESS, {}, None)
+                return
+
+            lambda_client = boto3.client('lambda')
+            try:
+                response = lambda_client.invoke(
+                    FunctionName=event['ResourceProperties']['EventDestinationFunctionName'],
+                    Payload=json.dumps({
+                        'StripeApiKey': event['ResourceProperties']['StripeApiKey'],
+                        'EventDestinationName': event['ResourceProperties']['EventDestinationName'],
+                        'EnabledEvents': event['ResourceProperties']['EnabledEvents'],
+                        'StripeAPIVersion': event['ResourceProperties']['StripeAPIVersion'],
+                        'Description': event['ResourceProperties']['Description'],
+                        'EventFrom': event['ResourceProperties']['EventFrom'],
+                        'Metadata': event['ResourceProperties']['Metadata'],
+                        'EventPayload': event['ResourceProperties']['EventPayload'],
+                        'SnapshotAPIVersion': event['ResourceProperties']['SnapshotAPIVersion']
+                    })
+                )
+
+                # Read the payload from the Lambda response
+                response_payload = json.loads(response['Payload'].read().decode())
+                logger.info(f"Lambda response: {json.dumps(response_payload)}")
+
+                if response_payload.get('statusCode') == 200:
+                    inner_json = json.loads(response_payload['body'])
+                    eventbridgearn = inner_json['amazon_eventbridge']['aws_event_source_arn']
+                    eventbridgeid = inner_json['id']
+                    eventbridgename = "aws.partner/stripe.com/" + eventbridgeid
+                    cfnresponse.send(event, context, cfnresponse.SUCCESS, {
+                        "EventBridgeName": eventbridgename
+                    }, None)
+                else:
+                    error_body = json.loads(response_payload['body'])
+                    error_message = error_body['error']['message']
+                    error_type = error_body['error']['type']
+                    
+                    logger.error(f"StripeEventDestinationFunction error: {error_type} - {error_message}")
+                    cfnresponse.send(event, context, cfnresponse.FAILED, {
+                        'error': {
+                            'message': error_message,
+                            'type': error_type
+                        }
+                    }, None)
+
+            except Exception as e:
+                logger.error('Exception: %s', e, exc_info=True)
+                cfnresponse.send(event, context, cfnresponse.FAILED, {
+                    'error': {
+                        'message': str(e),
+                        'type': 'invocation_error'
+                    }
+                }, None)
+
+      Description: Invoke a function to create a log stream.
+      MemorySize: 128
+      Timeout: 600
+      Role: !GetAtt role.Arn
+      Tracing: Active
+
+  role:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: "sts:AssumeRole"
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaRole
+  Primerinvoke:
+    Type: AWS::CloudFormation::CustomResource
+    DependsOn: InvokeStripeEventDestination
+    Version: "1.0"
+    Properties:
+      ServiceToken: !GetAtt InvokeStripeEventDestination.Arn
+      StripeApiKey: !Ref StripeApiKey
+      EventDestinationName: !Ref EventDestinationName
+      EnabledEvents: !Ref EnabledEvents
+      StripeAPIVersion: !Ref StripeAPIVersion
+      Description: !Ref Description
+      EventFrom: !Ref EventFrom
+      Metadata: !Ref Metadata
+      EventPayload: !Ref EventPayload
+      EventDestinationFunctionName: !Ref StripeEventDestinationFunction
+      SnapshotAPIVersion: !Ref SnapshotAPIVersion
+
+
+  StripeEventBus:
+    Type: AWS::Events::EventBus
+    DependsOn: Primerinvoke
+    Properties:
+      Name: !GetAtt Primerinvoke.EventBridgeName
+      EventSourceName: !GetAtt Primerinvoke.EventBridgeName
+  LogsRule:
+    Type: AWS::Events::Rule
+    Properties:
+      EventBusName: !Ref StripeEventBus
+      EventPattern:
+        account:
+          - !Ref AWS::AccountId
+      Targets:
+        - Arn: !GetAtt LogGroupForEvents.Arn
+          Id: LogTarget
+  LogGroupForEvents:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName:  !Join 
+        - '-'
+        - [!Ref 'AWS::StackName', 'StripeEventBridgeLogGroup']
+  LogGroupForEventsPolicy:
+    Type: AWS::Logs::ResourcePolicy
+    Properties:
+      PolicyName:  !Join 
+        - '-'
+        - [!Ref 'AWS::StackName', 'EventBridgeToCWLogsPolicy']
+
+      PolicyDocument: !Sub >
+        {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Sid": "EventBridgetoCWLogsCreateLogStreamPolicy",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "events.amazonaws.com"
+                ]
+              },
+              "Action": [
+                "logs:CreateLogStream"
+              ],
+              "Resource": [
+                "${LogGroupForEvents.Arn}"
+              ]
+            },
+            {
+              "Sid": "EventBridgetoCWLogsPutLogEventsPolicy",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "events.amazonaws.com"
+                ]
+              },
+              "Action": [
+                "logs:PutLogEvents"
+              ],
+              "Resource": [
+                "${LogGroupForEvents.Arn}"
+              ],
+              "Condition": {
+                "ArnEquals": {"AWS:SourceArn": "${LogsRule.Arn}"}
+              }
+            }
+          ]
+        }
+
+Outputs:
+  LambdaFunctionName:
+    Description: The name of the created Lambda function
+    Value: !Ref StripeEventDestinationFunction
+  eventbridgename:
+    Value: !GetAtt
+      - Primerinvoke
+      - EventBridgeName

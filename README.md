@@ -1,9 +1,14 @@
-# Stripe EventDestination Integration
+# Streamlining Financial Operations: Leveraging Stripe event destinations with Amazon EventBridge
 
 
-Stripe is a financial infrastructure platform that provides businesses with the tools to power their online and in person payments, embedded financial services, and custom revenue models. In this fast-paced digital world, customer payment flows require automated workflows to kick off processes such as fulfilling orders after a successful payment, granting user access after a subscription upgrade, or sending notifications for refund processing. 
+Stripe is a financial infrastructure platform that provides businesses with the tools to power their online and in person payments, embedded financial services, and custom revenue models. In this fast-paced digital world, customer payment flows require automated workflows to kick off processes such as fulfilling orders after a successful payment, granting user access after a subscription upgrade, or sending notifications for refund processing. Traditionally, customers send Stripe events to webhook endpoints, and in this blog post, we'll explore a new workflow automation using Stripe event destinations.
 
-Prior to today, customers sent Stripe events to webhook endpoints, and in this blog post, we'll explore a new workflow automation using Stripe’s new Event Destinations. With Stripe’s Event Destinations, AWS customers can seamlessly send Stripe events directly to Amazon EventBridge, enabling them to fully leverage their event-driven architectures on AWS. This solution allows you to receive events reliably and securely within your AWS infrastructure, eliminating the need to manage additional infrastructure or write additional integration code. Event Destinations is currently being rolled out to all Stripe accounts across the next several weeks. Once it is enabled on your Stripe account, you’ll be able to send and manage events to Amazon EventBridge by registering a new destination in the Stripe Dashboard using Workbench or programmatically using the API.
+At AWS, we constantly innovate to help our financial services customers streamline their operations and enhance their customer experiences. Today, we're excited to showcase a powerful integration between Stripe, a leading financial infrastructure platform, and our own Amazon EventBridge - a serverless, event-driven service that helps connect your applications together by ingesting, transforming, and delivering events.
+
+If you're both an AWS and Stripe customer, you can create Stripe event destinations to receive real-time updates about your Stripe accounts directly in Amazon EventBridge. Previously, Stripe only supported sending events to a webhook endpoint. 
+By integrating with Amazon EventBridge using Stripe event destinations, you can receive event data from Stripe directly in your AWS account. This eliminates the need to handle traffic and manage integration code logic yourself. When Amazon EventBridge receives events, it can route them to 20 supported targets to process or trigger business automations.
+In this blog post, we'll guide you through this integration workflow automation. You'll learn how this solution allows you to receive events reliably and securely within your AWS infrastructure, without the need to manage additional infrastructure or write additional integration code.
+
 
 # Achitecture Diagram
 
